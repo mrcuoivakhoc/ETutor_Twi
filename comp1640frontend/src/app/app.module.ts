@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
-
 import { AppComponent } from './app.component';
 import { StudentsComponent } from './components/admin/students/students.component';
 import { AdminComponent } from './components/admin/admin.component';

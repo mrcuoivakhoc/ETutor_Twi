@@ -28,4 +28,14 @@ export class MajorService {
     console.log(123);
   }
 
+  
+  deleteMajor(id: number): Observable<void> {
+    return this.HttpClient.delete<void>(`${this.majorUrl}/delete/${id}`);
+  }
+
+  updateMajor(major: Major, majorId: number):Observable<any>{
+    return this.HttpClient.put(`${this.majorUrl}/update/${majorId}`, major);
+  }
+
+
 }

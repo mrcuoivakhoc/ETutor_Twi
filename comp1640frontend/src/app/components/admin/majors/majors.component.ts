@@ -17,6 +17,9 @@ export class MajorsComponent implements OnInit {
   majorForm!: FormGroup;
   majors: Major[] =[];
 
+  checkSaveOrUpdate: number = 0;
+  majorUpdateId!: number;
+
 
   constructor(private formBuilder: FormBuilder,
               private majorService: MajorService,
@@ -43,6 +46,8 @@ export class MajorsComponent implements OnInit {
     if (this.model) {
       this.model.nativeElement.style.display = 'none';
     }
+    (document.getElementById('majorName') as HTMLInputElement).value ='';
+    (document.getElementById('description') as HTMLInputElement).value ='';
   }
 
 
@@ -52,14 +57,29 @@ export class MajorsComponent implements OnInit {
       name: this.majorForm.value.name,
       description: this.majorForm.value.description
     };
+
+    if(this.checkSaveOrUpdate == 0){
       this.majorService.saveMajor(newMajor).subscribe(
         data =>{
           this.listProduct();
         }
       ) 
       this.closeModal();  
-      
     }
+
+    if(this.checkSaveOrUpdate == 1){
+      this.majorService.updateMajor(newMajor, this.majorUpdateId).subscribe(
+        data =>{
+          console.log(data);
+          this.listProduct();
+
+        }
+      )
+      this.closeModal();  
+    }
+
+
+  }
 
   listProduct() {
     this.majorService.getMajorList().subscribe(
@@ -69,4 +89,42 @@ export class MajorsComponent implements OnInit {
     )
   }
 
+
+  updateMajor(major: Major){
+    this.checkSaveOrUpdate = 1;
+    (document.getElementById('majorName') as HTMLInputElement).value = major.name + '';
+    (document.getElementById('description') as HTMLInputElement).value = major.description + '';
+    this.majorForm.value.name = major.name + '';
+    this.majorForm.value.description = major.description + '';
+
+    console.log(major.name);
+    console.log(major.description);
+    
+    this.majorUpdateId = major.id!;
+    this.openModal();
+  }
+
+
+
+  
+  deleteMajor(major: Major){
+
+    if (confirm('Do you want to delete this major?')) {
+
+    this.majorService.deleteMajor(major.id!).subscribe(
+      {
+        next: () => {
+          console.log('Delete Successfully');
+          this.listProduct();
+        },
+        error: (error) => {
+          console.error('Delete failedly:', error);
+        }
+      }
+    )
+
+    }
+
+
+  }
 }
