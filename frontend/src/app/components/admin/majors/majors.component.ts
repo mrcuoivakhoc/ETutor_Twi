@@ -48,6 +48,7 @@ export class MajorsComponent implements OnInit {
     }
     (document.getElementById('majorName') as HTMLInputElement).value ='';
     (document.getElementById('description') as HTMLInputElement).value ='';
+    this.checkSaveOrUpdate = 0
   }
 
 
@@ -57,6 +58,8 @@ export class MajorsComponent implements OnInit {
       name: this.majorForm.value.name,
       description: this.majorForm.value.description
     };
+    console.log(newMajor);
+
 
     if(this.checkSaveOrUpdate == 0){
       this.majorService.saveMajor(newMajor).subscribe(
@@ -70,9 +73,8 @@ export class MajorsComponent implements OnInit {
     if(this.checkSaveOrUpdate == 1){
       this.majorService.updateMajor(newMajor, this.majorUpdateId).subscribe(
         data =>{
-          console.log(data);
+          console.log(data);  
           this.listProduct();
-
         }
       )
       this.closeModal();  
@@ -94,11 +96,17 @@ export class MajorsComponent implements OnInit {
     this.checkSaveOrUpdate = 1;
     (document.getElementById('majorName') as HTMLInputElement).value = major.name + '';
     (document.getElementById('description') as HTMLInputElement).value = major.description + '';
-    this.majorForm.value.name = major.name + '';
-    this.majorForm.value.description = major.description + '';
+
+    this.majorForm.setValue({
+      name: major.name,
+      description: major.description
+    });
 
     console.log(major.name);
     console.log(major.description);
+
+    console.log(this.majorForm.value.name);
+    console.log(this.majorForm.value.description);
     
     this.majorUpdateId = major.id!;
     this.openModal();
