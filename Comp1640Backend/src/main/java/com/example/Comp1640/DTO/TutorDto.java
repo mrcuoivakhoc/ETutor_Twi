@@ -1,5 +1,7 @@
 package com.example.Comp1640.DTO;
 
+import com.example.Comp1640.Entity.Tutor;
+
 import java.time.LocalDate;
 
 public class TutorDto {
@@ -87,11 +89,11 @@ public class TutorDto {
         this.majorDto = majorDto;
     }
 
-    public TutorDto( String name, LocalDate birthday, String imageFile, String username, MajorDto majorDto) {
-        this.name = name;
-        this.birthday = birthday;
-        this.imageFile = imageFile;
-        this.username = username;
-        this.majorDto = majorDto;
+    public TutorDto( Tutor tutor) {
+        this.name = tutor.getName();
+        this.birthday = tutor.getBirthday();
+        this.imageFile = tutor.getImageFile();
+        this.username = tutor.getUser().getUsername();
+        this.majorDto = new MajorDto(tutor.getMajor());
     }
 }

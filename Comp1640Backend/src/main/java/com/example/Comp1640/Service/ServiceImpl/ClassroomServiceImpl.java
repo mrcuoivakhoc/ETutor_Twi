@@ -28,6 +28,8 @@ public class ClassroomServiceImpl implements ClassroomService {
     @Autowired
     private StudentRepository studentRepository;
 
+    @Autowired
+    private MailService mailService;
 
     @Override
     public List<ClassroomDto> getAllClassroomDto() {
@@ -64,6 +66,12 @@ public class ClassroomServiceImpl implements ClassroomService {
             classroomRepository.save(new Classroom(tutor, student));
         }
 
+
+        mailService.sendMail(
+                "tienanh11022002@gmail.com",
+                "Thông báo phân lớp",
+                "hello, bạn đã đc phân lớp"
+        );
         return "Saved successfully";
     }
 

@@ -1,6 +1,7 @@
 package com.example.Comp1640.DTO;
 
 import com.example.Comp1640.Entity.Major;
+import com.example.Comp1640.Entity.Student;
 import com.example.Comp1640.Entity.User;
 import jakarta.persistence.*;
 
@@ -89,13 +90,14 @@ public class StudentDto {
         this.majorDto = majorDto;
     }
 
-    public StudentDto( String name, LocalDate birthday, String imageFile, String username, MajorDto majorDto) {
-        this.name = name;
-        this.birthday = birthday;
-        this.imageFile = imageFile;
-        this.username = username;
-        this.majorDto = majorDto;
+    public StudentDto( Student student) {
+        this.name = student.getName();
+        this.birthday = student.getBirthday();
+        this.imageFile = student.getImageFile();
+        this.username = student.getUser().getUsername();
+        this.majorDto = new MajorDto(student.getMajor());
     }
+
 
 
 
