@@ -5,11 +5,9 @@ import com.example.Comp1640.Entity.LoginRequest;
 import com.example.Comp1640.Service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -19,7 +17,8 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginRequest request) {
-        System.out.println(request.getUsername());
+        String token = authService.login(request);  // Gọi hàm login từ service
+        System.out.println("Token: " + token);
         return ResponseEntity.ok(authService.login(request));
     }
 }

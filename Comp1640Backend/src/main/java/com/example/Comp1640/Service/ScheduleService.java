@@ -8,7 +8,11 @@ import java.util.List;
 public interface ScheduleService {
 
     ScheduleDto saveSchedule(ScheduleDto scheduleDto);
-    List<Schedule> getStudentSchedules(Long studentId);
-    List<Schedule> getTutorSchedules(Long tutorId);
+    List<ScheduleDto> getStudentSchedules(Long studentId);
+    List<ScheduleDto> getTutorSchedules(Long tutorId);
+    List<ScheduleDto> getSchedulesAll();
+
+    ScheduleDto updateSchedule(Long id, ScheduleDto scheduleDto);
+    void deleteSchedule(Long id);
 
 }

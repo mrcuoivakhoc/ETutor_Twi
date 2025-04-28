@@ -8,9 +8,12 @@ import com.example.Comp1640.Repository.UserRepository;
 import com.example.Comp1640.Service.ChatMessageService;
 import com.example.Comp1640.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -31,19 +34,33 @@ public class ChatMessageServiceImpl implements ChatMessageService {
 
     @Override
     public void sendMessageOneToOne(WbsChatMessage wbsChatMessage) {
-
         Long senderId = userService.findIdByUser(wbsChatMessage.getSender());
-        User sender = userService.findUserById(senderId).orElse(null);
-
         Long recipientId = userService.findIdByUser(wbsChatMessage.getRecipient());
-        User recipient = userService.findUserById(recipientId).orElse(null);
-
-
-        ChatMessage chatMessage = new ChatMessage(sender, recipient, wbsChatMessage.getContent());
+        ChatMessage chatMessage = new ChatMessage(senderId, recipientId, wbsChatMessage.getContent());
         chatMessageRepository.save(chatMessage);
 
-        messagingTemplate.convertAndSendToUser(recipient.getUsername(), "/queue/messages", wbsChatMessage);
+        messagingTemplate.convertAndSendToUser(wbsChatMessage.getRecipient(), "/queue/messages", wbsChatMessage);
+        System.out.println("📤 Sending message to user: " + wbsChatMessage.getRecipient());
 
+    }
 
+    @Override
+    public List<WbsChatMessage> getOldMessages(Long user1Id, Long user2Id) {
+        String user1;
+        String user2;
+
+        List<ChatMessage> chatMessages = chatMessageRepository.findChatHistory(user1Id, user2Id);
+        List<WbsChatMessage> wbsChatMessages = new ArrayList<>();
+
+        for (ChatMessage chatMessage : chatMessages) {
+
+            user1 = userService.findUserById(chatMessage.getSenderId()).get().getUsername();
+            user2 = userService.findUserById(chatMessage.getRecipientId()).get().getUsername();
+
+            wbsChatMessages.add(new WbsChatMessage( user1, user2,chatMessage.getContent()));
+
+        }
+
+        return wbsChatMessages;
     }
 }

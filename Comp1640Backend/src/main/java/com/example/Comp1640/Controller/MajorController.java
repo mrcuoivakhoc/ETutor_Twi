@@ -36,8 +36,7 @@ public class MajorController {
     }
 
     @PutMapping("/update/{id}")
-        public ResponseEntity<MajorDto> update(@PathVariable Long id,@RequestBody(required = false) MajorDto majorDto ) {
-        return ResponseEntity.ok(majorService.updateMajor(id, majorDto));
+    public ResponseEntity<MajorDto> update(@PathVariable Long id,@RequestBody(required = false) MajorDto majorDto ) {return ResponseEntity.ok(majorService.updateMajor(id, majorDto));
     }
 
 

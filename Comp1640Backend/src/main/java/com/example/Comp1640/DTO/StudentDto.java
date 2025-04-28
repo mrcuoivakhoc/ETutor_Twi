@@ -1,27 +1,41 @@
 package com.example.Comp1640.DTO;
 
-import com.example.Comp1640.Entity.Major;
-import com.example.Comp1640.Entity.User;
-import jakarta.persistence.*;
-
+import com.example.Comp1640.Entity.Student;
 import java.time.LocalDate;
 
 public class StudentDto {
 
     private Long id;
-
     private String name;
-
     private LocalDate birthday;
-
     private String imageFile;
-
     private String username;
-
     private MajorDto majorDto;
 
-    private Long majorDtoId;
+    // Constructor mặc định
+    public StudentDto() {}
 
+    // Constructor đầy đủ
+    public StudentDto(Long id, String name, LocalDate birthday, String imageFile, String username, MajorDto majorDto) {
+        this.id = id;
+        this.name = name;
+        this.birthday = birthday;
+        this.imageFile = imageFile;
+        this.username = username;
+        this.majorDto = majorDto;
+    }
+
+    // Constructor từ entity Student
+    public StudentDto(Student student) {
+        this.id = student.getId();
+        this.name = student.getName();
+        this.birthday = student.getBirthday();
+        this.imageFile = student.getImageFile();
+        this.username = student.getUser().getUsername();
+        this.majorDto = new MajorDto(student.getMajor());
+    }
+
+    // Getter & Setter
     public Long getId() {
         return id;
     }
@@ -66,39 +80,7 @@ public class StudentDto {
         return majorDto;
     }
 
-    public Long getMajorDtoId() {
-        return majorDtoId;
-    }
-
-    public void setMajorDtoId(Long majorDtoId) {
-        this.majorDtoId = majorDtoId;
-    }
-
     public void setMajorDto(MajorDto majorDto) {
         this.majorDto = majorDto;
     }
-
-    public StudentDto() {}
-
-    public StudentDto(Long id, String name, LocalDate birthday, String imageFile, String username, MajorDto majorDto) {
-        this.id = id;
-        this.name = name;
-        this.birthday = birthday;
-        this.imageFile = imageFile;
-        this.username = username;
-        this.majorDto = majorDto;
-    }
-
-    public StudentDto( String name, LocalDate birthday, String imageFile, String username, MajorDto majorDto) {
-        this.name = name;
-        this.birthday = birthday;
-        this.imageFile = imageFile;
-        this.username = username;
-        this.majorDto = majorDto;
-    }
-
-
-
-
-
 }

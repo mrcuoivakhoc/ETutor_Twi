@@ -36,15 +36,14 @@ public class User {
     @OneToOne(mappedBy = "user",targetEntity = Admin.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Admin admin;
 
-    @OneToMany( mappedBy="sender",targetEntity = ChatMessage.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Set<ChatMessage> chatMessagesSender;
-
-    @OneToMany( mappedBy="recipient",targetEntity = ChatMessage.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Set<ChatMessage> chatMessagesRecipient;
-
     @OneToMany( mappedBy="user",targetEntity = Blog.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<Blog> blogs;
 
+    @OneToMany( mappedBy="user",targetEntity = BlogLike.class, cascade = CascadeType.ALL,orphanRemoval = true)
+    private Set<BlogLike> postLikes;
+
+    @OneToMany( mappedBy="user",targetEntity = Comment.class, cascade = CascadeType.ALL,orphanRemoval = true)
+    private Set<Comment> comments;
 
     public User( String username, String email, String password, Role role, Student student, Tutor tutor, Admin admin) {
         this.username = username;

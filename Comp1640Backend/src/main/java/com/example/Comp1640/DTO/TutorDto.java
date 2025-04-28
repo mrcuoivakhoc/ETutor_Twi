@@ -1,25 +1,19 @@
 package com.example.Comp1640.DTO;
 
+import com.example.Comp1640.Entity.Tutor;
+
 import java.time.LocalDate;
 
 public class TutorDto {
 
-
-
     private Long id;
-
     private String name;
-
     private LocalDate birthday;
-
     private String imageFile;
-
     private String username;
-
     private MajorDto majorDto;
 
-    private Long majorDtoId;
-
+    // Getter & Setter
     public Long getId() {
         return id;
     }
@@ -64,18 +58,11 @@ public class TutorDto {
         return majorDto;
     }
 
-    public Long getMajorDtoId() {
-        return majorDtoId;
-    }
-
-    public void setMajorDtoId(Long majorDtoId) {
-        this.majorDtoId = majorDtoId;
-    }
-
     public void setMajorDto(MajorDto majorDto) {
         this.majorDto = majorDto;
     }
 
+    // Constructors
     public TutorDto() {}
 
     public TutorDto(Long id, String name, LocalDate birthday, String imageFile, String username, MajorDto majorDto) {
@@ -87,11 +74,12 @@ public class TutorDto {
         this.majorDto = majorDto;
     }
 
-    public TutorDto( String name, LocalDate birthday, String imageFile, String username, MajorDto majorDto) {
-        this.name = name;
-        this.birthday = birthday;
-        this.imageFile = imageFile;
-        this.username = username;
-        this.majorDto = majorDto;
+    public TutorDto(Tutor tutor) {
+        this.id = tutor.getId(); // ✅ thêm dòng này để hiện ID
+        this.name = tutor.getName();
+        this.birthday = tutor.getBirthday();
+        this.imageFile = tutor.getImageFile();
+        this.username = tutor.getUser().getUsername();
+        this.majorDto = new MajorDto(tutor.getMajor());
     }
 }

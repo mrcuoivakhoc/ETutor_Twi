@@ -5,6 +5,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 
 @Entity
@@ -31,17 +32,47 @@ public class Blog {
     @Column(name = "updatedAt")
     private LocalDateTime updatedAt;
 
+    @OneToMany( mappedBy="blog",targetEntity = BlogLike.class, cascade = CascadeType.ALL,orphanRemoval = true)
+    private Set<BlogLike> postLikes;
+
+    @OneToMany( mappedBy="blog",targetEntity = Comment.class, cascade = CascadeType.ALL,orphanRemoval = true)
+    private Set<Comment> comments;
+
+
+    @Lob
+    @Column(name = "file_data", columnDefinition = "LONGBLOB")
+    private byte[] fileData;
+
+    @Column(name = "file_name")
+    private String fileName;
+
+    @Column(name = "file_type")
+    private String fileType;
+
+
     public Blog(){}
 
-    public Blog(String content, User user) {
-        this.content = content;
-        this.user = user;
-    }
-
-    public Blog(Long id, String content, User user) {
+    public Blog(Long id, String content, User user, LocalDateTime createdAt, LocalDateTime updatedAt, Set<BlogLike> postLikes, byte[] fileData, String fileName, String fileType) {
         this.id = id;
         this.content = content;
         this.user = user;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.postLikes = postLikes;
+        this.fileData = fileData;
+        this.fileName = fileName;
+        this.fileType = fileType;
+    }
+
+    public Blog(String content, User user, LocalDateTime createdAt, LocalDateTime updatedAt, Set<BlogLike> postLikes, byte[] fileData, String fileName, String fileType) {
+        this.content = content;
+        this.user = user;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.postLikes = postLikes;
+        this.fileData = fileData;
+        this.fileName = fileName;
+        this.fileType = fileType;
     }
 
     public Long getId() {
@@ -74,5 +105,53 @@ public class Blog {
 
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public Set<BlogLike> getLikes() {
+        return postLikes;
+    }
+
+    public void setLikes(Set<BlogLike> postLikes) {
+        this.postLikes = postLikes;
+    }
+
+    public Set<BlogLike> getPostLikes() {
+        return postLikes;
+    }
+
+    public void setPostLikes(Set<BlogLike> postLikes) {
+        this.postLikes = postLikes;
+    }
+
+    public byte[] getFileData() {
+        return fileData;
+    }
+
+    public void setFileData(byte[] fileData) {
+        this.fileData = fileData;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getFileType() {
+        return fileType;
+    }
+
+    public void setFileType(String fileType) {
+        this.fileType = fileType;
     }
 }

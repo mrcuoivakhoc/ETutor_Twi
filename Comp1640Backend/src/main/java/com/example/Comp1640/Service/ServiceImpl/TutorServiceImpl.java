@@ -1,14 +1,11 @@
 package com.example.Comp1640.Service.ServiceImpl;
 
 import com.example.Comp1640.DTO.MajorDto;
-import com.example.Comp1640.DTO.StudentDto;
 import com.example.Comp1640.DTO.TutorDto;
 import com.example.Comp1640.Entity.Major;
-import com.example.Comp1640.Entity.Student;
 import com.example.Comp1640.Entity.Tutor;
 import com.example.Comp1640.Entity.User;
 import com.example.Comp1640.Repository.ClassroomRepository;
-import com.example.Comp1640.Repository.StudentRepository;
 import com.example.Comp1640.Repository.TutorRepository;
 import com.example.Comp1640.Service.MajorService;
 import com.example.Comp1640.Service.TutorService;
@@ -19,24 +16,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.nio.file.*;
+import java.util.*;
 
 @Service
 public class TutorServiceImpl implements TutorService {
 
     @Autowired
-    private ClassroomRepository classroomRepository;
-    @Autowired
     private TutorRepository tutorRepository;
+
+    @Autowired
+    private ClassroomRepository classroomRepository;
+
     @Autowired
     private UserService userService;
+
     @Autowired
     private MajorService majorService;
 
@@ -45,41 +39,64 @@ public class TutorServiceImpl implements TutorService {
 
     private static final String UPLOAD_DIR = "uploads/";
 
-
-
     @Override
     public List<TutorDto> getAllTutorDto() {
-        List<Tutor> listTutors = tutorRepository.findAll();
-        List<TutorDto> listStudentDto = new ArrayList<>();
-
-        if (!listTutors.isEmpty()) {
-            for(int i = 0; i < listTutors.size(); i++){
-                TutorDto tutorDto = new TutorDto(listTutors.get(i).getId(),listTutors.get(i).getName(),listTutors.get(i).getBirthday(),listTutors.get(i).getImageFile(),listTutors.get(i).getUser().getUsername(), new MajorDto(listTutors.get(i).getMajor()));
-                listStudentDto.add(tutorDto);
-            }
-            return listStudentDto;
-        } else {
-            return null;
+        List<Tutor> tutors = tutorRepository.findAll();
+        List<TutorDto> tutorDtos = new ArrayList<>();
+        for (Tutor tutor : tutors) {
+            tutorDtos.add(new TutorDto(tutor));
         }
+        return tutorDtos;
+    }
+
+    @Override
+    public TutorDto getTutorById(Long id) {
+        Tutor tutor = tutorRepository.findById(id).orElse(null);
+        return tutor != null ? new TutorDto(tutor) : null;
+    }
+
+    @Override
+    public String createTutor(TutorDto tutorDto, MultipartFile file) throws IOException {
+        Long userId = userService.findIdByUser(tutorDto.getUsername());
+        if (tutorRepository.findIdByUserId(userId) != null) {
+            return "User already registered as a tutor!";
+        }
+
+        User user = userService.findUserById(userId).orElse(null);
+        Major major = majorService.findMajorById(tutorDto.getMajorDto().getId()).orElse(null);
+        String imageUrl = null;
+
+        if (file != null && !file.isEmpty()) {
+            imageUrl = saveFile(file);
+        }
+
+        Tutor tutor = new Tutor();
+        tutor.setName(tutorDto.getName());
+        tutor.setBirthday(tutorDto.getBirthday());
+        tutor.setImageFile(imageUrl);
+        tutor.setUser(user);
+        tutor.setMajor(major);
+
+        tutorRepository.save(tutor);
+        return "Tutor created successfully";
     }
 
     @Override
     public String updateTutor(Long id, TutorDto tutorDto, MultipartFile file) throws IOException {
         Tutor existingTutor = tutorRepository.findById(id).orElse(null);
+        if (existingTutor == null) return "Tutor not found";
 
         Long userId = userService.findIdByUser(tutorDto.getUsername());
+        User user = userService.findUserById(userId).orElse(null);
+        Major major = majorService.findMajorById(tutorDto.getMajorDto().getId()).orElse(null);
 
-        User user = userService.findUserById(userId).get();
-
-        Major major = majorService.findMajorById(tutorDto.getMajorDtoId()).orElse(null);
-
-        if(!Objects.equals(tutorDto.getMajorDtoId(), existingTutor.getMajor().getId())){
-            classroomRepository.deleteByStudentId(existingTutor.getMajor().getId());
+        if (!Objects.equals(tutorDto.getMajorDto().getId(), existingTutor.getMajor().getId())) {
+            classroomRepository.deleteByStudentId(existingTutor.getId()); // nếu mapping theo student thì giữ nguyên
         }
 
-        if(file != null) {
+        if (file != null && !file.isEmpty()) {
             String imageUrl = saveFile(file);
-            this.deleteFile(existingTutor.getImageFile().replace("/uploads/", ""));
+            deleteFile(existingTutor.getImageFile().replace("/uploads/", ""));
             tutorDto.setImageFile(imageUrl);
         }
 
@@ -88,39 +105,44 @@ public class TutorServiceImpl implements TutorService {
         existingTutor.setImageFile(tutorDto.getImageFile().replace("http://localhost:8080", ""));
         existingTutor.setUser(user);
         existingTutor.setMajor(major);
-        tutorRepository.save(existingTutor);
 
+        tutorRepository.save(existingTutor);
         return "Update successfully";
     }
 
+    @Override
+    public String deleteTutor(Long id) {
+        Tutor tutor = tutorRepository.findById(id).orElse(null);
+        if (tutor != null) {
+            deleteFile(tutor.getImageFile().replace("/uploads/", ""));
+            classroomRepository.deleteByStudentId(tutor.getId());
+            tutorRepository.deleteById(id);
+            return "Tutor deleted successfully";
+        }
+        return "Tutor not found";
+    }
 
-
-    public boolean deleteFile(String fileName) {
+    private boolean deleteFile(String fileName) {
         try {
-            Path filePath = Paths.get("uploads", fileName);
+            Path filePath = Paths.get(UPLOAD_DIR, fileName);
             Files.delete(filePath);
-            return true; // Xóa thành công
+            return true;
         } catch (IOException e) {
             e.printStackTrace();
-            return false; // Xóa thất bại
+            return false;
         }
     }
 
     private String saveFile(MultipartFile file) throws IOException {
-        // Tạo thư mục lưu file nếu chưa có
         Path uploadPath = Path.of(UPLOAD_DIR);
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
         }
 
-        // Tạo tên file duy nhất
         String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-
-        // Lưu file vào thư mục
         Path filePath = uploadPath.resolve(fileName);
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-        return "/uploads/" + fileName; // Trả về đường dẫn file
+        return "/uploads/" + fileName;
     }
-
 }

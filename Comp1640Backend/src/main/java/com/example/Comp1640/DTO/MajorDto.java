@@ -1,10 +1,6 @@
 package com.example.Comp1640.DTO;
 
-
 import com.example.Comp1640.Entity.Major;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.Column;
 
 public class MajorDto {
 
@@ -12,6 +8,26 @@ public class MajorDto {
     private String name;
     private String description;
 
+    // ✅ Constructor mặc định (bắt buộc cho Spring và Jackson)
+    public MajorDto() {}
+
+    // ✅ Constructor đầy đủ
+    public MajorDto(Long id, String name, String description) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+    }
+
+    // ✅ Constructor từ Entity
+    public MajorDto(Major major) {
+        if (major != null) {
+            this.id = major.getId();
+            this.name = major.getName();
+            this.description = major.getDescription();
+        }
+    }
+
+    // ✅ Getter & Setter
     public Long getId() {
         return id;
     }
@@ -34,22 +50,5 @@ public class MajorDto {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    @JsonCreator
-    public MajorDto(@JsonProperty("id") Long id) {
-        this.id = id;
-    }
-
-    public MajorDto(Long id, String name, String description) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-    }
-
-    public MajorDto(Major major) {
-        this.id = major.getId();
-        this.name = major.getName();
-        this.description = major.getDescription();
     }
 }

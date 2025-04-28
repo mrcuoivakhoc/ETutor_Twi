@@ -26,27 +26,47 @@ public class Schedule {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 
+    @Column(name = "day_of_week")
+    private String dayOfWeek; // Thứ (VD: "Thứ Hai")
+
+    @Column(name = "week_of_year")
+    private String weekOfYear; // Số tuần trong năm (VD: 14)
+
+    @Column(name = "status")
     private String status;
+
+    @Column(name = "scheduleFormat")
+    private String scheduleFormat;
+
+    @Column(name = "address")
+    private String address;
 
     public Schedule() {}
 
-    public Schedule(Long id, Student student, Tutor tutor, LocalDateTime startTime, LocalDateTime endTime, String status) {
+    public Schedule(Long id, Student student, Tutor tutor, LocalDateTime startTime, LocalDateTime endTime, String dayOfWeek, String weekOfYear, String status, String scheduleFormat, String address) {
         this.id = id;
         this.student = student;
         this.tutor = tutor;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.dayOfWeek = dayOfWeek;
+        this.weekOfYear = weekOfYear;
         this.status = status;
+        this.scheduleFormat = scheduleFormat;
+        this.address = address;
     }
 
-    public Schedule( Student student, Tutor tutor, LocalDateTime startTime, LocalDateTime endTime, String status) {
+    public Schedule(Student student, Tutor tutor, LocalDateTime startTime, LocalDateTime endTime, String dayOfWeek, String weekOfYear, String status, String scheduleFormat, String address) {
         this.student = student;
         this.tutor = tutor;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.dayOfWeek = dayOfWeek;
+        this.weekOfYear = weekOfYear;
         this.status = status;
+        this.scheduleFormat = scheduleFormat;
+        this.address = address;
     }
-
 
     public Long getId() {
         return id;
@@ -94,5 +114,37 @@ public class Schedule {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getDayOfWeek() {
+        return dayOfWeek;
+    }
+
+    public void setDayOfWeek(String dayOfWeek) {
+        this.dayOfWeek = dayOfWeek;
+    }
+
+    public String getWeekOfYear() {
+        return weekOfYear;
+    }
+
+    public void setWeekOfYear(String weekOfYear) {
+        this.weekOfYear = weekOfYear;
+    }
+
+    public String getScheduleFormat() {
+        return scheduleFormat;
+    }
+
+    public void setScheduleFormat(String scheduleFormat) {
+        this.scheduleFormat = scheduleFormat;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

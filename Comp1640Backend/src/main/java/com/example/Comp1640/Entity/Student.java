@@ -36,7 +36,7 @@ public class Student {
     @OneToMany( mappedBy="student",targetEntity = Classroom.class, cascade = CascadeType.ALL,orphanRemoval = true)
     private Set<Classroom> classrooms;
 
-    @OneToMany( mappedBy="student",targetEntity = Schedule.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany( mappedBy="student",targetEntity = Schedule.class, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Schedule> schedules;
 
     public Student( String name, LocalDate birthday, User user, Major major) {

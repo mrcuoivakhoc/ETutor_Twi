@@ -11,6 +11,7 @@ import com.example.Comp1640.Repository.UserRepository;
 import com.example.Comp1640.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,6 +24,9 @@ import java.util.*;
 
 @Service
 public class UserServiceImpl implements UserService {
+
+   /* @Autowired
+    private PasswordEncoder passwordEncoder;*/
 
     @Autowired
     private UserRepository userRepository;
@@ -76,6 +80,7 @@ public class UserServiceImpl implements UserService {
         User user = new User(definedUser.getUsername(),definedUser.getEmail(), definedUser.getPassword(), definedUser.getRole());
         UserDto userDto = new UserDto(definedUser.getUsername(),definedUser.getEmail(), definedUser.getPassword(), definedUser.getRole());
 
+       /* user.setPassword(passwordEncoder.encode(userDto.getPassword()));*/
         userRepository.save(user);
 
         if(Objects.equals(definedUser.getRole().toString(), "STUDENT")){

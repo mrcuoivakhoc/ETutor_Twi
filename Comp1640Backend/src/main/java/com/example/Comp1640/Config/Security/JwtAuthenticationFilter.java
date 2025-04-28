@@ -30,8 +30,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (JwtUtils.isValidToken(token)) {
                 String username = JwtUtils.extractUsername(token);
                 String role = JwtUtils.extractRole(token);
-
-
                 // tạo ra 1 đối tượng Authentication lưu vào SecurityContext để có thể dùng mọi nơi
                 List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
                 UserDetails userDetails = new User(username, "", authorities);
@@ -39,8 +37,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(
                         new UsernamePasswordAuthenticationToken(userDetails, null, authorities)
                 );
+//                System.out.println(role);
 
             }
+
+        }else{
+//            System.out.println(token + " Hanoi");
         }
 
         chain.doFilter(request, response);

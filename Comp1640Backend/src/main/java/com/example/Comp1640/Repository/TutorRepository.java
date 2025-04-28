@@ -1,5 +1,6 @@
 package com.example.Comp1640.Repository;
 
+import com.example.Comp1640.DTO.Dashboard.MajorCountDto;
 import com.example.Comp1640.Entity.Tutor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,5 +16,8 @@ public interface TutorRepository extends JpaRepository<Tutor, Long> {
 
     @Query(value = "SELECT id FROM tutor WHERE id_major = :id", nativeQuery = true)
     List<Long> findIdTutorsByMajorId(@Param("id") Long id);
+
+    @Query("SELECT new com.example.Comp1640.DTO.Dashboard.MajorCountDto(m.name, COUNT(t)) FROM Tutor t JOIN t.major m GROUP BY m.name")
+    List<MajorCountDto> countTutorsByMajor();
 
 }

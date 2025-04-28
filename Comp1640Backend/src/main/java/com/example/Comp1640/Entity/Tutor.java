@@ -32,7 +32,7 @@ public class Tutor {
     @OneToMany( mappedBy="tutor",targetEntity = Classroom.class, cascade = CascadeType.ALL,orphanRemoval = true)
     private Set<Classroom> classrooms;
 
-    @OneToMany( mappedBy="tutor",targetEntity = Schedule.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany( mappedBy="tutor",targetEntity = Schedule.class, cascade = CascadeType.ALL,orphanRemoval = true)
     private Set<Schedule> schedules;
 
     public Tutor( String name, LocalDate birthday, User user, Major major) {

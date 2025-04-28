@@ -62,14 +62,14 @@ public class MajorServiceImpl implements MajorService {
 
     @Override
     public MajorDto saveMajor(MajorDto majorDto) {
-        if(majorDto == null){
-            return null;
-        }else {
-            Major major = new Major(majorDto.getName(), majorDto.getDescription());
-            majorRepository.save(major);
-            return majorDto;
-        }
+        if (majorDto == null) return null;
+
+        Major major = new Major(majorDto.getName(), majorDto.getDescription());
+        Major saved = majorRepository.save(major);
+
+        return new MajorDto(saved); // Trả về DTO đã có ID
     }
+
 
     @Override
     public void deleteMajor(Long id) {
@@ -91,17 +91,19 @@ public class MajorServiceImpl implements MajorService {
 
     @Override
     public MajorDto updateMajor(Long id, MajorDto majorDto) {
-        try {
-            Major existingMajor = majorRepository.findById(id).orElse(null);
-            existingMajor.setName(majorDto.getName());
-            existingMajor.setDescription(majorDto.getDescription());
-            majorRepository.save(existingMajor);
-            return majorDto;
+        Optional<Major> optionalMajor = majorRepository.findById(id);
 
+        if (optionalMajor.isEmpty()) {
+            return null; // hoặc throw exception tùy thiết kế
         }
-        catch(Exception e){
-            return null;
-        }
+
+        Major existingMajor = optionalMajor.get();
+        existingMajor.setName(majorDto.getName());
+        existingMajor.setDescription(majorDto.getDescription());
+
+        Major updatedMajor = majorRepository.save(existingMajor);
+
+        return new MajorDto(updatedMajor); // ✅ Trả về DTO đầy đủ sau khi update
     }
 
     public boolean deleteFile(String fileName) {

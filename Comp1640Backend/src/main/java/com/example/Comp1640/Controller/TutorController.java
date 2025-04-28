@@ -19,29 +19,49 @@ import java.util.List;
 @RequestMapping("/api/tutor")
 public class TutorController {
 
-
     @Autowired
     private TutorService tutorService;
 
     @GetMapping()
     public ResponseEntity<List<TutorDto>> getAllTutorDto(HttpServletRequest request) {
         List<TutorDto> tutorDtos = tutorService.getAllTutorDto();
-        if(!(tutorDtos == null)) {
+        if (tutorDtos != null && !tutorDtos.isEmpty()) {
             String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
             for (TutorDto tutorDto : tutorDtos) {
                 tutorDto.setImageFile(baseUrl + tutorDto.getImageFile());
             }
             return ResponseEntity.ok(tutorDtos);
-        }else{
-            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.noContent().build();
         }
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<String> update(@PathVariable Long id, @ModelAttribute TutorDto tutorDto, @RequestParam(value = "file",required = false) MultipartFile file ) throws IOException {
-
-        return ResponseEntity.ok(tutorService.updateTutor(id, tutorDto,file));
+    @GetMapping("/{id}")
+    public ResponseEntity<TutorDto> getById(@PathVariable Long id, HttpServletRequest request) {
+        TutorDto dto = tutorService.getTutorById(id);
+        if (dto != null) {
+            String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+            dto.setImageFile(baseUrl + dto.getImageFile());
+            return ResponseEntity.ok(dto);
+        }
+        return ResponseEntity.notFound().build();
     }
 
+    @PostMapping("/create")
+    public ResponseEntity<String> create(@ModelAttribute TutorDto tutorDto,
+                                         @RequestParam(value = "file", required = false) MultipartFile file) throws IOException {
+        return ResponseEntity.ok(tutorService.createTutor(tutorDto, file));
+    }
 
+    @PutMapping("/update/{id}")
+    public ResponseEntity<String> update(@PathVariable Long id,
+                                         @ModelAttribute TutorDto tutorDto,
+                                         @RequestParam(value = "file", required = false) MultipartFile file) throws IOException {
+        return ResponseEntity.ok(tutorService.updateTutor(id, tutorDto, file));
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> delete(@PathVariable Long id) {
+        return ResponseEntity.ok(tutorService.deleteTutor(id));
+    }
 }

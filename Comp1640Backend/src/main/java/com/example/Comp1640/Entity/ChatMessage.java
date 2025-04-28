@@ -12,20 +12,18 @@ public class ChatMessage {
     @Column(name = "id")
     private int id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "senderId")
-    private User sender;
+    @Column(name = "senderId")
+    private Long senderId;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "recipientId")
-    private User recipient;
+    @Column(name = "recipientId")
+    private Long recipientId;
 
     @Column(name = "content")
     private String content;
 
-    public ChatMessage( User sender, User recipient, String content) {
-        this.sender = sender;
-        this.recipient = recipient;
+    public ChatMessage(Long senderId, Long recipientId, String content) {
+        this.senderId = senderId;
+        this.recipientId = recipientId;
         this.content = content;
     }
 
@@ -39,20 +37,20 @@ public class ChatMessage {
         this.id = id;
     }
 
-    public User getSenderId() {
-        return sender;
+    public Long getSenderId() {
+        return senderId;
     }
 
-    public void setSender(User sender) {
-        this.sender = sender;
+    public void setSenderId(Long senderId) {
+        this.senderId = senderId;
     }
 
-    public User getRecipient() {
-        return recipient;
+    public Long getRecipientId() {
+        return recipientId;
     }
 
-    public void setRecipient(User recipient) {
-        this.recipient = recipient;
+    public void setRecipientId(Long recipientId) {
+        this.recipientId = recipientId;
     }
 
     public String getContent() {

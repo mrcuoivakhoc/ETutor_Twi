@@ -2,13 +2,11 @@ package com.example.Comp1640.Service.ServiceImpl;
 
 import com.example.Comp1640.DTO.MajorDto;
 import com.example.Comp1640.DTO.StudentDto;
-import com.example.Comp1640.DTO.UserDto;
 import com.example.Comp1640.Entity.Major;
 import com.example.Comp1640.Entity.Student;
 import com.example.Comp1640.Entity.User;
 import com.example.Comp1640.Repository.ClassroomRepository;
 import com.example.Comp1640.Repository.StudentRepository;
-import com.example.Comp1640.Repository.UserRepository;
 import com.example.Comp1640.Service.MajorService;
 import com.example.Comp1640.Service.StudentService;
 import com.example.Comp1640.Service.UserService;
@@ -32,10 +30,13 @@ public class StudentServiceImpl implements StudentService {
 
     @Autowired
     private StudentRepository studentRepository;
+
     @Autowired
     private ClassroomRepository classroomRepository;
+
     @Autowired
     private UserService userService;
+
     @Autowired
     private MajorService majorService;
 
@@ -44,47 +45,64 @@ public class StudentServiceImpl implements StudentService {
 
     private static final String UPLOAD_DIR = "uploads/";
 
-
-
-
     @Override
     public List<StudentDto> getAllStudentDto() {
         List<Student> listStudents = studentRepository.findAll();
         List<StudentDto> listStudentDto = new ArrayList<>();
 
-        if (!listStudents.isEmpty()) {
-            for(int i = 0; i < listStudents.size(); i++){
-                StudentDto studentDto = new StudentDto(listStudents.get(i).getId(),listStudents.get(i).getName(),listStudents.get(i).getBirthday(),listStudents.get(i).getImageFile(),listStudents.get(i).getUser().getUsername(), new MajorDto(listStudents.get(i).getMajor()));
-                listStudentDto.add(studentDto);
-            }
-            return listStudentDto;
-        } else {
-            return null;
+        for (Student student : listStudents) {
+            listStudentDto.add(new StudentDto(student));
         }
+
+        return listStudentDto;
     }
 
+    @Override
+    public StudentDto getStudentById(Long id) {
+        Student student = studentRepository.findById(id).orElse(null);
+        return student != null ? new StudentDto(student) : null;
+    }
 
     @Override
-    public String updateStudent(Long id, StudentDto studentDto, MultipartFile file) throws IOException{
-        Student existingStudent = studentRepository.findById(id).orElse(null);
-
+    public String createStudent(StudentDto studentDto, MultipartFile file) throws IOException {
         Long userId = userService.findIdByUser(studentDto.getUsername());
+        User user = userService.findUserById(userId).orElse(null);
+        Major major = majorService.findMajorById(studentDto.getMajorDto().getId()).orElse(null);
 
-        User user = userService.findUserById(userId).get();
-
-        Major major = majorService.findMajorById(studentDto.getMajorDtoId()).orElse(null);
-
-        if(!Objects.equals(studentDto.getMajorDtoId(), existingStudent.getMajor().getId())){
-            classroomRepository.deleteByStudentId(existingStudent.getMajor().getId());
+        String imageUrl = null;
+        if (file != null && !file.isEmpty()) {
+            imageUrl = saveFile(file);
         }
 
-        if(file != null) {
+        Student student = new Student();
+        student.setName(studentDto.getName());
+        student.setBirthday(studentDto.getBirthday());
+        student.setImageFile(imageUrl);
+        student.setUser(user);
+        student.setMajor(major);
+
+        studentRepository.save(student);
+        return "Student created successfully";
+    }
+
+    @Override
+    public String updateStudent(Long id, StudentDto studentDto, MultipartFile file) throws IOException {
+        Student existingStudent = studentRepository.findById(id).orElse(null);
+        if (existingStudent == null) return "Student not found";
+
+        Long userId = userService.findIdByUser(studentDto.getUsername());
+        User user = userService.findUserById(userId).orElse(null);
+        Major major = majorService.findMajorById(studentDto.getMajorDto().getId()).orElse(null);
+
+        if (!Objects.equals(studentDto.getMajorDto().getId(), existingStudent.getMajor().getId())) {
+            classroomRepository.deleteByStudentId(existingStudent.getId());
+        }
+
+        if (file != null && !file.isEmpty()) {
             String imageUrl = saveFile(file);
             this.deleteFile(existingStudent.getImageFile().replace("/uploads/", ""));
             studentDto.setImageFile(imageUrl);
         }
-
-
 
         existingStudent.setName(studentDto.getName());
         existingStudent.setBirthday(studentDto.getBirthday());
@@ -96,35 +114,39 @@ public class StudentServiceImpl implements StudentService {
         return "Update successfully";
     }
 
+    @Override
+    public String deleteStudent(Long id) {
+        Student student = studentRepository.findById(id).orElse(null);
+        if (student != null) {
+            deleteFile(student.getImageFile().replace("/uploads/", ""));
+            classroomRepository.deleteByStudentId(student.getId());
+            studentRepository.deleteById(id);
+            return "Student deleted successfully";
+        }
+        return "Student not found";
+    }
 
-    public boolean deleteFile(String fileName) {
+    private boolean deleteFile(String fileName) {
         try {
             Path filePath = Paths.get("uploads", fileName);
             Files.delete(filePath);
-            return true; // Xóa thành công
+            return true;
         } catch (IOException e) {
             e.printStackTrace();
-            return false; // Xóa thất bại
+            return false;
         }
     }
 
     private String saveFile(MultipartFile file) throws IOException {
-        // Tạo thư mục lưu file nếu chưa có
         Path uploadPath = Path.of(UPLOAD_DIR);
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
         }
 
-        // Tạo tên file duy nhất
         String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-
-        // Lưu file vào thư mục
         Path filePath = uploadPath.resolve(fileName);
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-        return "/uploads/" + fileName; // Trả về đường dẫn file
+        return "/uploads/" + fileName;
     }
-
-
-
 }
