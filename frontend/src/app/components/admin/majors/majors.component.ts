@@ -31,7 +31,7 @@ export class MajorsComponent implements OnInit {
       name: ['', [Validators.required, Validators.minLength(3)]],
       description: ['', [Validators.required, Validators.minLength(3)]]
     });
-    this.listProduct();
+    this.listMajor();
   }
 
 
@@ -46,8 +46,14 @@ export class MajorsComponent implements OnInit {
     if (this.model) {
       this.model.nativeElement.style.display = 'none';
     }
-    (document.getElementById('majorName') as HTMLInputElement).value ='';
-    (document.getElementById('description') as HTMLInputElement).value ='';
+    // (document.getElementById('majorName') as HTMLInputElement).value ='';
+    // (document.getElementById('description') as HTMLInputElement).value ='';
+
+    this.majorForm.setValue({
+      name: '',
+      description: ''
+    });
+
     this.checkSaveOrUpdate = 0
   }
 
@@ -64,7 +70,7 @@ export class MajorsComponent implements OnInit {
     if(this.checkSaveOrUpdate == 0){
       this.majorService.saveMajor(newMajor).subscribe(
         data =>{
-          this.listProduct();
+          this.listMajor();
         }
       ) 
       this.closeModal();  
@@ -74,7 +80,7 @@ export class MajorsComponent implements OnInit {
       this.majorService.updateMajor(newMajor, this.majorUpdateId).subscribe(
         data =>{
           console.log(data);  
-          this.listProduct();
+          this.listMajor();
         }
       )
       this.closeModal();  
@@ -83,7 +89,7 @@ export class MajorsComponent implements OnInit {
 
   }
 
-  listProduct() {
+  listMajor() {
     this.majorService.getMajorList().subscribe(
       data =>{
         this.majors = data;
@@ -94,8 +100,8 @@ export class MajorsComponent implements OnInit {
 
   updateMajor(major: Major){
     this.checkSaveOrUpdate = 1;
-    (document.getElementById('majorName') as HTMLInputElement).value = major.name + '';
-    (document.getElementById('description') as HTMLInputElement).value = major.description + '';
+    // (document.getElementById('majorName') as HTMLInputElement).value = major.name + '';
+    // (document.getElementById('description') as HTMLInputElement).value = major.description + '';
 
     this.majorForm.setValue({
       name: major.name,
@@ -123,7 +129,7 @@ export class MajorsComponent implements OnInit {
       {
         next: () => {
           console.log('Delete Successfully');
-          this.listProduct();
+          this.listMajor();
         },
         error: (error) => {
           console.error('Delete failedly:', error);
